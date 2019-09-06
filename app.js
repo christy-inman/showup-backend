@@ -20,6 +20,10 @@ app.get('/:id', (request, response) => {
 app.post('/', (request, response) => {
     queries.createProtest(request.body)
         .then(response.status(201))
+}),
+app.delete('/:id', (request, response) => {
+    queries.deleteProtest(request.params.id)
+        .then(response.status(204))
 })
 
 console.log(`Listening on port ${port}`)

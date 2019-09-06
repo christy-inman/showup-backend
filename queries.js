@@ -12,5 +12,10 @@ module.exports = {
     createProtest(protest) {
         return database('protests')
             .insert(protest)
+    },
+    deleteProtest(id) {
+        return database('protest')
+            .where({id})
+            .delete()
     }
 }
