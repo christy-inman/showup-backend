@@ -8,5 +8,9 @@ module.exports = {
         return database('protests')
             .where({id})
             .first()
+    },
+    createProtest(protest) {
+        return database('protests')
+            .insert(protest)
     }
 }

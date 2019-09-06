@@ -16,6 +16,10 @@ app.get('/', (request, response) => {
 app.get('/:id', (request, response) => {
     queries.getById(request.params.id)
         .then(protest => response.send(protest))
+}),
+app.post('/', (request, response) => {
+    queries.createProtest(request.body)
+        .then(response.status(201))
 })
 
 console.log(`Listening on port ${port}`)
