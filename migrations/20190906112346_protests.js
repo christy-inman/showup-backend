@@ -5,7 +5,7 @@ exports.up = function(knex) {
       protest.string('name')
       protest.text('image')
       protest.date('date')
-      protest.time('time')
+      protest.string('time')
       protest.string('location')
       protest.text('description')
       protest.text('donate')
