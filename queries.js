@@ -17,5 +17,10 @@ module.exports = {
         return database('protest')
             .where({id})
             .delete()
+    },
+    updateProtest(id, protest) {
+        return database('protests')
+            .where({id})
+            .update(protest)
     }
 }

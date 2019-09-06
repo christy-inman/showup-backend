@@ -24,6 +24,10 @@ app.post('/', (request, response) => {
 app.delete('/:id', (request, response) => {
     queries.deleteProtest(request.params.id)
         .then(response.status(204))
+}),
+app.put('/:id', (request, response) => {
+    queries.updateProtest(request.parrams.id, request.body)
+        .then(protest => response.send(protest))
 })
 
 console.log(`Listening on port ${port}`)
