@@ -1,13 +1,52 @@
 const express = require('express')
 const app = express()
-const port = process.env.PORT || 3000
 const cors = require('cors')
 const bodyParser = require('body-parser')
+// const router = express.Router()
+const nodemailer = require('nodemailer')
+const port = process.env.PORT || 3000
 const queries = require('./queries')
 
-app.listen(port)
+const transport = {
+    host: 'smtp.gmail.com',
+    auth: {
+        user: 'christyinman4@gmail.com',
+        pass: 'ejwrbqmhgbhgorlc'
+    }
+}
+const transporter = nodemailer.createTransport(transport)
+
+app.listen(port, () => {
+    console.log(`Listening on port ${port}`)
+})
 app.use(cors())
 app.use(bodyParser.json())
+
+transporter.verify((error, success) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Server is ready to take messages');
+    }
+  })
+
+app.post('/send', (request, response) => {
+    let {name} = request.body
+    let {email} = request.body
+    let {message} = request.body
+    let content = `name: ${name} \n email: ${email} \n message: ${message} `
+    console.log(content)
+    const mail = {
+        from: name,
+        to: 'showup.speakout@gmail.com',
+        subject: 'New Message from Contact Form',
+        text: content
+    }
+
+    transporter.sendMail(mail, (error, data) => {
+        error ? response.json({msg: 'fail'}) : response.json({msg: 'success'})
+    })
+})
 
 app.get('/', (request, response) => {
     queries.allProtests()
@@ -19,15 +58,15 @@ app.get('/:id', (request, response) => {
 }),
 app.post('/', (request, response) => {
     queries.createProtest(request.body)
-        .then(response.status(201))
+        .then(protest => response.send(protest))
 }),
 app.delete('/:id', (request, response) => {
     queries.deleteProtest(request.params.id)
-        .then(response.status(204))
+        .then(protest => response.send(protest))
 }),
 app.put('/:id', (request, response) => {
-    queries.updateProtest(request.parrams.id, request.body)
+    queries.updateProtest(request.params.id, request.body)
         .then(protest => response.send(protest))
 })
 
-console.log(`Listening on port ${port}`)
+module.exports = app
