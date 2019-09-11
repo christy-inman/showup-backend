@@ -2,10 +2,10 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const bodyParser = require('body-parser')
-// const router = express.Router()
 const nodemailer = require('nodemailer')
 const port = process.env.PORT || 3000
 const queries = require('./queries')
+const User = require('./models/user')
 
 const transport = {
     host: 'smtp.gmail.com',
@@ -35,7 +35,6 @@ app.post('/send', (request, response) => {
     let {email} = request.body
     let {message} = request.body
     let content = `name: ${name} \n email: ${email} \n message: ${message} `
-    console.log(content)
     const mail = {
         from: name,
         to: 'showup.speakout@gmail.com',
@@ -46,6 +45,13 @@ app.post('/send', (request, response) => {
     transporter.sendMail(mail, (error, data) => {
         error ? response.json({msg: 'fail'}) : response.json({msg: 'success'})
     })
+})
+
+app.post('/signup', User.signup)
+
+app.get('/users', (request, response) => {
+    queries.allUsers()
+        .then(users => response.send(users))
 })
 
 app.get('/', (request, response) => {
