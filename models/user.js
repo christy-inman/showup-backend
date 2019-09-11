@@ -40,7 +40,40 @@ const signup = (request, response) => {
         .catch(error => console.log(error))
 }
 
+const findUser = (userRequest) => {
+    return database('users').where(username = userRequest.username)
+}
+
+const checkPassword = (requestPassword) => {
+    return new Promise((resolve, reject) => 
+    bcrypt.compare(requestPassword, foundUser.password_digest, 
+        (error, response) => {
+            if (error) {reject(error)}
+            else if (response) {resolve(response)}
+            else {reject(new Error('Passwords do not match.'))}
+        }))
+}
+
+const updateUserToken = (token, user) => {
+    return database('users')
+        .where(id === user.id)
+        .update(user.token = token)
+}
+
+const login = (request, response) => {
+    const userRequest = request.body
+    let user
+
+    findUser(userRequest)
+        .then(foundUser => {
+            user = foundUser
+            return checkPassword(userRequest, foundUser)
+        })
+        .then(() => createToken())
+        .then(token => updateUserToken(token, user))
+}
+
 module.exports = {
     signup,
-    // signin
+    login
 }

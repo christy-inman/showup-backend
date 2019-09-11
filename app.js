@@ -49,6 +49,8 @@ app.post('/send', (request, response) => {
 
 app.post('/signup', User.signup)
 
+app.post('/login', User.login)
+
 app.get('/users', (request, response) => {
     queries.allUsers()
         .then(users => response.send(users))
