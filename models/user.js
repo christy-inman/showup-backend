@@ -35,7 +35,7 @@ const signup = (request, response) => {
         .then(() => createUser(user))
         .then(user => {
             delete user.password_digest
-            response.status(201).json({user})
+            response.status(201).json(user)
         })
         .catch(error => console.log(error))
 }
@@ -60,6 +60,12 @@ const updateUserToken = (token, user) => {
         .update(user.token = token)
 }
 
+const deleteUserToken = (user) => {
+    return database('users')
+        .where(id === user.id)
+        .delete(user.token)
+}
+
 const login = (request, response) => {
     const userRequest = request.body
     let user
@@ -71,9 +77,38 @@ const login = (request, response) => {
         })
         .then(() => createToken())
         .then(token => updateUserToken(token, user))
+        .then(user => {
+            delete user.password_digest
+            response.status(200).json(user)
+        })
+        .catch(error => console.log(error))
+}
+
+const findByToken = (token) => {
+    return database('users').where({token})
+}
+
+const authenticate = (userRequest) => {
+    findByToken(userRequest.token)
+        .then(user => {
+            if (user.username === userRequest.username) {
+                return true}
+            else {return false}
+        })
+}
+
+const logout = (request, response) => {
+    const userRequest = request.body
+
+    findUser(userRequest)
+        .then(user => deleteUserToken(user))
+        .then(res => response.json(res))
+        .catch(error => console.log(error))
 }
 
 module.exports = {
     signup,
-    login
+    login,
+    authenticate,
+    logout
 }

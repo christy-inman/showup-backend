@@ -51,6 +51,8 @@ app.post('/signup', User.signup)
 
 app.post('/login', User.login)
 
+app.put('/logout', User.logout)
+
 app.get('/users', (request, response) => {
     queries.allUsers()
         .then(users => response.send(users))
