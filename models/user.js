@@ -54,6 +54,7 @@ const checkPassword = (requestPassword, foundUser) => {
         }))
 }
 
+// deleted because only used it once, so coded straight in promise
 // const deleteUserToken = (user) => {
 //     return database('users')
 //         .where({id: user.id})
