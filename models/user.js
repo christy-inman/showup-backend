@@ -40,11 +40,11 @@ const signup = (request, response) => {
         .catch(error => console.log(error))
 }
 
-const findUser = (userRequest) => {
-    return database('users').where(username = userRequest.username)
+const findUser = (user) => {
+    return database('users').where({email: user.email}).first()
 }
 
-const checkPassword = (requestPassword) => {
+const checkPassword = (requestPassword, foundUser) => {
     return new Promise((resolve, reject) => 
     bcrypt.compare(requestPassword, foundUser.password_digest, 
         (error, response) => {
@@ -54,17 +54,11 @@ const checkPassword = (requestPassword) => {
         }))
 }
 
-const updateUserToken = (token, user) => {
-    return database('users')
-        .where(id === user.id)
-        .update(user.token = token)
-}
-
-const deleteUserToken = (user) => {
-    return database('users')
-        .where(id === user.id)
-        .delete(user.token)
-}
+// const deleteUserToken = (user) => {
+//     return database('users')
+//         .where({id: user.id})
+//         .delete(user.token)
+// }
 
 const login = (request, response) => {
     const userRequest = request.body
@@ -73,14 +67,11 @@ const login = (request, response) => {
     findUser(userRequest)
         .then(foundUser => {
             user = foundUser
-            return checkPassword(userRequest, foundUser)
+            return checkPassword(userRequest.password, foundUser)
         })
         .then(() => createToken())
-        .then(token => updateUserToken(token, user))
-        .then(user => {
-            delete user.password_digest
-            response.status(200).json(user)
-        })
+        .then(token => user.token = token)
+        .then(userToken => {response.json(userToken)})
         .catch(error => console.log(error))
 }
 
@@ -91,7 +82,7 @@ const findByToken = (token) => {
 const authenticate = (userRequest) => {
     findByToken(userRequest.token)
         .then(user => {
-            if (user.username === userRequest.username) {
+            if (user.email === userRequest.email) {
                 return true}
             else {return false}
         })
@@ -101,7 +92,7 @@ const logout = (request, response) => {
     const userRequest = request.body
 
     findUser(userRequest)
-        .then(user => deleteUserToken(user))
+        .then(user => user.token = '')
         .then(res => response.json(res))
         .catch(error => console.log(error))
 }
